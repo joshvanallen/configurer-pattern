@@ -5,7 +5,6 @@ import './style.css';
 const appDiv: HTMLElement = document.getElementById('app');
 appDiv.innerHTML = `<h1>TypeScript Starter</h1>`;
 
-
 interface WorkflowStepConfiguration {
   readonly title: string | ((params: any) => string);
   readonly enableBackButton: boolean;
@@ -19,23 +18,27 @@ interface WorkflowStep {
 }
 
 const myStepConfiguration: WorkflowStepConfiguration = {
-  title: () => 'My Title',
+  title: ({ value }) => `My ${value} Title`,
   enableBackButton: true,
   showSubmitButton: true,
 };
 
-function createStep(
-  stepConfiguration: WorkflowStepConfiguration
-): WorkflowStep {
-  const params = {};
-  return {
-    title:
-      typeof stepConfiguration.title === 'function'
-        ? stepConfiguration.title(params)
-        : stepConfiguration.title,
-    showBackButton: stepConfiguration.enableBackButton, // could be more logic here
-    showSubmitButton: stepConfiguration.showSubmitButton,
+const createStep =
+  (value: boolean) =>
+  (stepConfiguration: WorkflowStepConfiguration): WorkflowStep => {
+    const params = {};
+    return {
+      title:
+        typeof stepConfiguration.title === 'function'
+          ? stepConfiguration.title({ value })
+          : stepConfiguration.title,
+      showBackButton: stepConfiguration.enableBackButton, // could be more logic here
+      showSubmitButton: stepConfiguration.showSubmitButton,
+    };
   };
-}
 
-appDiv.innerHTML = `<p>${JSON.stringify(createStep(myStepConfiguration))}</p>`;
+const createTrueStep = createStep(true);
+
+appDiv.innerHTML = `<p>${JSON.stringify(
+  createTrueStep(myStepConfiguration)
+)}</p>`;
